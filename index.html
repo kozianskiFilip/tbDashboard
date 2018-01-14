@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BC3</title>
+
+    <!--DODAWANIE BIBLIOTEK Z CDN-->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src = "//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/js/bootstrap.min.js"></script>
+    <link href = "//maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" rel = "stylesheet">
+
+    <link rel = "stylesheet" href = "https://code.jquery.com/mobile/1.4.5/jquery.mobile-1.4.5.min.css">
+    <link href = "http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.3/themes/dark-hive/jquery-ui.css" rel = "stylesheet">
+    <script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
+    <!--DODAWANIE LOKALNYCH BIBLIOTEK I PLIKÓW JS-->
+    <link href="css/styles.css" rel="stylesheet">
+    <link href="css/test.css" rel="stylesheet">
+    <script src="js/app.js"></script>
+</head>
+<body>
+<div class="container">
+    <table class="table table-responsive table-bordered" id="mainTable">
+        <tr>
+            <th colspan="2">BC3 OUTPUT</th>
+            <th>BC4 OUTPUT</th>
+            <th>INVENTORY</th>
+            <th colspan="2">NO TIRES</th>
+        </tr>
+        <tr>
+            <td id="buildingOutputForecast" colspan="2"></td>
+            <td id="curingOutputForecast"></td>
+            <td id="inventory"></td>
+            <td id="lackTires" colspan="2"></td>
+        </tr>
+        <tr>
+            <td id="bc3Realization"></td>
+            <td id="bc3VsBc4"></td>
+            <td id="bc4Realization"></td>
+            <td id="inventoryDiff"></td>
+            <td id="bc3NoTires"></td>
+            <td id="seitoNoTires"></td>
+        </tr>
+    </table>
+</div>
+
+
+</body>
+</html>

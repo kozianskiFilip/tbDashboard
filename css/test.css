@@ -1,0 +1,13 @@
+#mainTable tr td {
+    text-align: center;
+}
+
+#mainTable th {
+    text-align: center;
+}
+
+@media screen and (max-width: 700px){
+    #mainTable {
+        font-size:10px;
+    }
+}
