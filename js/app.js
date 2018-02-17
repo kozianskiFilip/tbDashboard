@@ -4,9 +4,9 @@ var minimumInventory = 11700;
 var optimalInventory = 13100;
 
 function test(){
-    alert('AAA');
-    $("#mainPage").load('http://pldpk/bc3/buildingdayreport/dayreport.php');
-};
+
+
+}
 
 $(document).ready(function(){
 
@@ -16,7 +16,7 @@ $(document).ready(function(){
            if(!$('#'+jasonData[i].gt).html())
            {
                var actCurCoverage = (jasonData[i].buildingInvOk/(jasonData[i].moldQty*jasonData[i].curePerHour));
-                    actCurCoverage= Math.trunc(actCurCoverage) + ':' + Math.round((actCurCoverage*60)%60);
+                    actCurCoverage= jasonData[i].moldQty >0 ? Math.trunc(actCurCoverage) + ':' + Math.round((actCurCoverage*60)%60) : '';
 
                var realCurCoverage = (jasonData[i].buildingInvOk/(jasonData[i].realMoldQty*jasonData[i].realCurePerHour));
                realCurCoverage= Math.trunc(realCurCoverage) + ':' + Math.round((realCurCoverage*60)%60);
@@ -24,7 +24,7 @@ $(document).ready(function(){
                var plannedCurCoverage = (jasonData[i].buildingInvOk/(jasonData[i].plannedMoldQty*jasonData[i].plannedCurePerHour));
                plannedCurCoverage= Math.trunc(plannedCurCoverage) + ':' + Math.round((plannedCurCoverage*60)%60);
 
-               $('#kanbanTable').append('<tr value="1" class="kanbanRow" id="'+jasonData[i].gt+'"><td>'+jasonData[i].gt+'</td>' +
+               $('#kanbanTable').append('<tr value="1" class="kanbanRow '+(jasonData[i].buildingMachines == null ? 'warning' : ' ')+'" id="'+jasonData[i].gt+'"><td>'+jasonData[i].gt+'</td>' +
                    '<td id="actCoverage">'+actCurCoverage+'</td>' + //pokrycie wulkanizacji wg zazbrojenia w RFBC
                    '<td id="actCoverage">'+realCurCoverage+'</td>' + //pokrycie wulkanizacji wg aktualnego stanu
                    '<td id="actCoverage">'+plannedCurCoverage+'</td>' + //pokrycie wulkanizacji wg planu
@@ -36,25 +36,20 @@ $(document).ready(function(){
                    '</tr>');
            }
 
-           $('#kanbanTable').append('<tr value="1" id="'+jasonData[i].gt+'presslist" style="">' +
+           $('#kanbanTable').append('<tr value="1" id="'+jasonData[i].gt+'presslist" style="display:none;">' +
                '<td style="display:none">A</td>' +
                '<td style="display:none"></td>' +
                '<td style="display:none"></td>' +
-               '<td colspan="6" ;">'+jasonData[i].pressess+'</td>' +
+               '<td colspan="9">'+jasonData[i].pressess+'</td>' +
                '<td style="display:none"></td>' +
                '<td style="display:none"></td>' +
                '</tr>');
        }
+        //CLICK ON KANBAN ROW - SHOW PRESSESS
+        $('.kanbanRow').on("click", function (){
+            $(this).next().toggle();
+        });
     });
-
-    //CLICK ON KANBAN ROW - SHOW PRESSESS
-    $('.kanbanRow').on("click", function (){
-        alert('XXX');
-        $(this).next().toggle();
-       // alert($(this).next().html());
-    });
-
-
 
     //MAIN TABLE FILL
     $.getJSON('php/buildingData.php',function(jasonData){

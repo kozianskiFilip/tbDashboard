@@ -1,15 +1,27 @@
 #mainTable tr td {
     text-align: center;
+    vertical-align: middle;
 }
 
-#mainTable, #kanbanTable th {
+
+
+#kanbanTable th, #mainTable th {
     text-align: center;
+    vertical-align: middle;
 }
+
+
 
 @media screen and (max-width: 700px){
     #mainTable {
         font-size:10px;
     }
+    #kanbanTable {
+        font-size:8px;
+    }
+}
+
+@media screen and (max-width: 800px) {
     #kanbanTable {
         font-size:10px;
     }
