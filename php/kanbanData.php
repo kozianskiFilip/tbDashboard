@@ -85,87 +85,101 @@ $avgCycleTime=0;
 $data=array();
 
 $stidKanban = oci_parse($ffmesConnection,
-    "SELECT distinct gtcode, 
-       press, 
-       curing_schedule, 
-       fh, 
-       cur_plan100, 
-       cur_plan90, 
+    "SELECT s1.*, 
        CASE 
-         WHEN cur_cycle_time != 0 THEN cur_cycle_time 
-         WHEN cur_cycle_time = 0 
-              AND cur_plan100 != 0 THEN Round(fh * 60 / cur_plan100, 2) 
-       END                      cur_cycle_time, 
-       active, 
-       cur_last_prod, 
-       cur_last_down, 
-       cur_status, 
-       cur_last_dwn_code, 
-       CASE 
-         WHEN cur_status = 'D' THEN cur_dwn_desc 
-         ELSE 'PRODUKCJA' 
-       END                      PRESS_STATUS, 
-       cur_dwn_col, 
-       buil_schedule, 
-       buil_output, 
-       buil_machines, 
-       inv_ok, 
-       inv_nok, 
-       cur_molds_qty, 
-       buil_groups, 
-       buil_machines_qty, 
-       when_updated, 
-       SUM(CASE 
-             WHEN cur_last_prod < 60 
-                  AND ( ( cur_last_dwn_code != '16100' 
-                           OR cur_status = 'P' ) 
-                        AND active = 1 ) THEN 1 
-             ELSE 0 
-           END) 
-         over ( 
-           PARTITION BY gtcode) REAL_PRESS_QTY, 
-       Count(DISTINCT press) 
-         over ( 
-           PARTITION BY gtcode) PLANNED_PRESS_QTY, 
-       SUM(cur_plan100) 
-         over ( 
-           PARTITION BY gtcode) SUM_PLANNED_PLAN, 
-       SUM(CASE 
-             WHEN cur_last_prod < 60 
-                  AND ( ( cur_last_dwn_code != '16100' 
-                           OR cur_status = 'P' ) 
-                        AND active = 1 ) THEN cur_plan100 
-             ELSE 0 
-           END) 
-         over ( 
-           PARTITION BY gtcode) SUM_REAL_PLAN, 
-       SUM(CASE 
-             WHEN active = 1 THEN cur_plan100 
-             ELSE 0 
-           END) 
-         over ( 
-           PARTITION BY gtcode) SUM_ACT_CT, 
-       SUM(fh) 
-         over ( 
-           PARTITION BY gtcode) SUM_ACT_FH, 
-       SUM(CASE 
-             WHEN cur_last_prod < 60 
-                  AND ( ( cur_last_dwn_code != '16100' 
-                           OR cur_status = 'P' ) 
-                        AND active = 1 ) THEN fh 
-             ELSE 0 
-           END) 
-         over ( 
-           PARTITION BY gtcode) SUM_REAL_FH ,
-        SUM(fh) 
-         over ( 
-        PARTITION BY gtcode) SUM_PLANNED_FH
-FROM   build_kanban 
-WHERE  cur_plan100 > 0 
-ORDER  BY gtcode, 
-          active DESC, 
-          cur_plan100 DESC, 
-          press");
+         WHEN cur_molds_qty > 0 THEN inv_ok / ( sum_act_ct / sum_act_fh * 
+                                                cur_molds_qty 
+                                              ) 
+         ELSE 30 
+       END coverage 
+FROM   (SELECT DISTINCT gtcode, 
+                        press, 
+                        curing_schedule, 
+                        fh, 
+                        cur_plan100, 
+                        cur_plan90, 
+                        CASE 
+                          WHEN cur_cycle_time != 0 THEN cur_cycle_time 
+                          WHEN cur_cycle_time = 0 
+                               AND cur_plan100 != 0 THEN 
+                          Round(fh * 60 / cur_plan100, 2) 
+                        END                      cur_cycle_time, 
+                        active, 
+                        cur_last_prod, 
+                        cur_last_down, 
+                        cur_status, 
+                        cur_last_dwn_code, 
+                        CASE 
+                          WHEN cur_status = 'D' THEN cur_dwn_desc 
+                          ELSE 'PRODUKCJA' 
+                        END                      PRESS_STATUS, 
+                        cur_dwn_col, 
+                        buil_schedule, 
+                        buil_output, 
+                        buil_machines, 
+                        inv_ok, 
+                        inv_nok, 
+                        cur_molds_qty, 
+                        buil_groups, 
+                        buil_machines_qty, 
+                        when_updated, 
+                        SUM(CASE 
+                              WHEN cur_last_prod < 60 
+                                   AND ( ( cur_last_dwn_code != '16100' 
+                                            OR cur_status = 'P' ) 
+                                         AND active = 1 ) THEN 1 
+                              ELSE 0 
+                            END) 
+                          over ( 
+                            PARTITION BY gtcode) REAL_PRESS_QTY, 
+                        Count(DISTINCT press) 
+                          over ( 
+                            PARTITION BY gtcode) PLANNED_PRESS_QTY, 
+                        SUM(cur_plan100) 
+                          over ( 
+                            PARTITION BY gtcode) SUM_PLANNED_PLAN, 
+                        SUM(CASE 
+                              WHEN cur_last_prod < 60 
+                                   AND ( ( cur_last_dwn_code != '16100' 
+                                            OR cur_status = 'P' ) 
+                                         AND active = 1 ) THEN cur_plan100 
+                              ELSE 0 
+                            END) 
+                          over ( 
+                            PARTITION BY gtcode) SUM_REAL_PLAN, 
+                        SUM(CASE 
+                              WHEN active = 1 THEN cur_plan100 
+                              ELSE 0 
+                            END) 
+                          over ( 
+                            PARTITION BY gtcode) SUM_ACT_CT, 
+                        SUM(CASE 
+                              WHEN active = 1 THEN fh 
+                              ELSE 0 
+                            END) 
+                          over ( 
+                            PARTITION BY gtcode) SUM_ACT_FH, 
+                        SUM(CASE 
+                              WHEN cur_last_prod < 60 
+                                   AND ( ( cur_last_dwn_code != '16100' 
+                                            OR cur_status = 'P' ) 
+                                         AND active = 1 ) THEN fh 
+                              ELSE 0 
+                            END) 
+                          over ( 
+                            PARTITION BY gtcode) SUM_REAL_FH, 
+                        SUM(fh) 
+                          over ( 
+                            PARTITION BY gtcode) SUM_PLANNED_FH 
+        FROM   build_kanban 
+        WHERE  cur_plan100 > 0 
+        ORDER  BY gtcode, 
+                  active DESC, 
+                  cur_plan100 DESC, 
+                  press) s1 
+ORDER  BY coverage, 
+          gtcode, 
+          press ");
 
 oci_execute($stidKanban);
 

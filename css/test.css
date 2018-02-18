@@ -3,13 +3,10 @@
     vertical-align: middle;
 }
 
-
-
 #kanbanTable th, #mainTable th {
     text-align: center;
     vertical-align: middle;
 }
-
 
 
 @media screen and (max-width: 700px){
@@ -27,6 +24,8 @@
     }
 }
 
+
+td .
 
 /* Tooltip container */
 .hintTip {
