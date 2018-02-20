@@ -4,8 +4,27 @@ var minimumInventory = 11700;
 var optimalInventory = 13100;
 
 function test(){
+    $('.kanbanRow').hide();
+$('.Krupp').show();
+alert('aaa');
+}
 
+function filter(type){
+    $('.pressList').hide();
 
+    if(type == 'ALL')
+        $('.kanbanRow').show();
+    else if(type == 'TRAD')
+    {
+        $('.kanbanRow').show();
+        $('.Krupp').hide();
+        $('.PLT').hide();
+    }
+    else
+    {
+        $('.kanbanRow').hide();
+        $(type).show();
+    }
 }
 
 $(document).ready(function(){
@@ -16,27 +35,27 @@ $(document).ready(function(){
            if(!$('#'+jasonData[i].gt).html())
            {
                var actCurCoverage = (jasonData[i].buildingInvOk/(jasonData[i].moldQty*jasonData[i].curePerHour));
-                    actCurCoverage= jasonData[i].moldQty >0 ? Math.trunc(actCurCoverage) + ':' + Math.round((actCurCoverage*60)%60) : '';
+                   var actCurCoverageText= jasonData[i].moldQty >0 ? Math.trunc(actCurCoverage) + ':' + Math.round((actCurCoverage*60)%60) : '';
 
                var realCurCoverage = (jasonData[i].buildingInvOk/(jasonData[i].realMoldQty*jasonData[i].realCurePerHour));
-               realCurCoverage= Math.trunc(realCurCoverage) + ':' + Math.round((realCurCoverage*60)%60);
+               var realCurCoverageText= jasonData[i].realMoldQty >0 ?  Math.trunc(realCurCoverage) + ':' + Math.round((realCurCoverage*60)%60) : '';
 
                var plannedCurCoverage = (jasonData[i].buildingInvOk/(jasonData[i].plannedMoldQty*jasonData[i].plannedCurePerHour));
-               plannedCurCoverage= Math.trunc(plannedCurCoverage) + ':' + Math.round((plannedCurCoverage*60)%60);
+               var plannedCurCoverageText= jasonData[i].plannedMoldQty >0 ? Math.trunc(plannedCurCoverage) + ':' + Math.round((plannedCurCoverage*60)%60) : '';
 
-               $('#kanbanTable').append('<tr value="1" class="kanbanRow '+(jasonData[i].buildingMachines == null ? 'warning' : ' ')+'" id="'+jasonData[i].gt+'"><td>'+jasonData[i].gt+'</td>' +
-                   '<td id="actCoverage">'+actCurCoverage+'</td>' + //pokrycie wulkanizacji wg zazbrojenia w RFBC
-                   '<td id="actCoverage">'+realCurCoverage+'</td>' + //pokrycie wulkanizacji wg aktualnego stanu
-                   '<td id="actCoverage">'+plannedCurCoverage+'</td>' + //pokrycie wulkanizacji wg planu
+               $('#kanbanTable').append('<tr value="1" class="kanbanRow '+jasonData[i].buildingGroup+' '+(jasonData[i].buildingMachines == null ? 'warning' : ' ')+'" id="'+jasonData[i].gt+'"><td>'+jasonData[i].gt+'</td>' +
+                   '<td id="actCoverage" class="'+(actCurCoverage > 8 ? 'success' : (actCurCoverage > 3 ? 'warning' : 'danger' ))+'">'+actCurCoverageText+'</td>' + //pokrycie wulkanizacji wg zazbrojenia w RFBC
+                   '<td id="realCoverage"  class="'+(realCurCoverage > 8 ? 'success' : (realCurCoverage > 3 ? 'warning' : 'danger' ))+'">'+realCurCoverageText+'</td>' + //pokrycie wulkanizacji wg aktualnego stanu
+                   '<td id="plannedCoverage"  class="'+(plannedCurCoverage > 8 ? 'success' : (plannedCurCoverage > 3 ? 'warning' : 'danger' ))+'">'+plannedCurCoverageText+'</td>' + //pokrycie wulkanizacji wg planu
                    '<td>'+jasonData[i].moldQty+'/'+jasonData[i].realMoldQty+'/'+jasonData[i].plannedMoldQty+'</td>' +  // ilość form
-                   '<td>'+jasonData[i].buildingMachines+'</td>' +
+                   '<td style="text-align: left;">'+jasonData[i].buildingMachines+'</td>' +
                    '<td>'+jasonData[i].buildingInvOk+'('+jasonData[i].buildingInvNok+')</td>' +
-                   '<td></td>' +
+                   '<td>'+jasonData[i].moldsNoTires+'</td>' +
                    '<td style="display:none"></td>' +
                    '</tr>');
            }
 
-           $('#kanbanTable').append('<tr value="1" id="'+jasonData[i].gt+'presslist" style="display:none;">' +
+           $('#kanbanTable').append('<tr value="1" class="pressList" id="'+jasonData[i].gt+'presslist" style="display:none; text-align: left;">' +
                '<td style="display:none">A</td>' +
                '<td style="display:none"></td>' +
                '<td style="display:none"></td>' +
@@ -110,7 +129,6 @@ $(document).ready(function(){
         $('#bc3Realization').html(jasonData.bc3pred - jasonData.bc3plan);
         $('#bc3VsBc4').html(jasonData.bc3pred - jasonData.bc4pred)
     });
-
 
 
 });

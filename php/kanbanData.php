@@ -125,7 +125,7 @@ FROM   (SELECT DISTINCT gtcode,
                         when_updated, 
                         SUM(CASE 
                               WHEN cur_last_prod < 60 
-                                   AND ( ( cur_last_dwn_code != '16100' 
+                                   OR ( ( (cur_last_dwn_code = '16100' and cur_status='D') 
                                             OR cur_status = 'P' ) 
                                          AND active = 1 ) THEN 1 
                               ELSE 0 
@@ -140,7 +140,7 @@ FROM   (SELECT DISTINCT gtcode,
                             PARTITION BY gtcode) SUM_PLANNED_PLAN, 
                         SUM(CASE 
                               WHEN cur_last_prod < 60 
-                                   AND ( ( cur_last_dwn_code != '16100' 
+                                   OR( ( (cur_last_dwn_code = '16100' and cur_status='D') 
                                             OR cur_status = 'P' ) 
                                          AND active = 1 ) THEN cur_plan100 
                               ELSE 0 
@@ -161,7 +161,7 @@ FROM   (SELECT DISTINCT gtcode,
                             PARTITION BY gtcode) SUM_ACT_FH, 
                         SUM(CASE 
                               WHEN cur_last_prod < 60 
-                                   AND ( ( cur_last_dwn_code != '16100' 
+                                   OR ( ( (cur_last_dwn_code = '16100' and cur_status='D')
                                             OR cur_status = 'P' ) 
                                          AND active = 1 ) THEN fh 
                               ELSE 0 
@@ -170,16 +170,16 @@ FROM   (SELECT DISTINCT gtcode,
                             PARTITION BY gtcode) SUM_REAL_FH, 
                         SUM(fh) 
                           over ( 
-                            PARTITION BY gtcode) SUM_PLANNED_FH 
+                            PARTITION BY gtcode) SUM_PLANNED_FH , sum(case when cur_status='D' and cur_last_dwn_code='16100' and active=1 then 1 else 0 end) over(partition by gtcode) count_notires
         FROM   build_kanban 
         WHERE  cur_plan100 > 0 
         ORDER  BY gtcode, 
                   active DESC, 
                   cur_plan100 DESC, 
                   press) s1 
-ORDER  BY coverage, 
+ORDER  BY count_notires desc, coverage, 
           gtcode, 
-          press ");
+          press");
 
 oci_execute($stidKanban);
 
@@ -194,7 +194,8 @@ while ($row = oci_fetch_array($stidKanban, OCI_BOTH))
             'plannedMoldQty' => $row[24], 'plannedCurePerHour' => round($row[25]/$row[30], 2),
             'builScheduled' => $row[14], 'buildingOutput' => $row[15], 'buildingInvOk' => $row[17],
             'buildingInvNok' => $row[18],  'buildingGroup' => $row[20],
-            'activeBuildingMachines' => $row[21] ,'buildingMachines' => $row[16]);
+            'activeBuildingMachines' => $row[21] ,'buildingMachines' => $row[16],
+            'moldsNoTires' => $row[31]);
         $gtCode=$row[0];
     }
     else
