@@ -80,7 +80,7 @@ if($h>=22 || $h<6)
 $stidCurResults = oci_parse($ffmesConnection,"select output,pred,plan_excel_total,prod,inv_ok,inv_nok,bc3_output,bc3_pred,bc3_schedule,transport,total,PLAN_EXCEL_1,PLAN_EXCEL_2,PLAN_EXCEL_3 from
                                             (
                                                 select * from cur_pred left join
-                                                cur_schedule on trunc(sysdate- interval '6' hour,'DDD')=DT
+                                                cur_schedule on trunc(sysdate- interval '6' hour,'DDD')=DT and 1=1
                                                 left join
                                                 (
                                                     select sum(qty) bc3_schedule from 
@@ -115,7 +115,7 @@ while ($row = oci_fetch_array($stidCurResults, OCI_BOTH))
 $stidNoTires = oci_parse($ffmesConnection, $text="select 
                                                     nvl(trunc(sum((down_edt-down_sdt)*24),2),0) SUMA,
                                                     nvl(TOTAL,0),
-                                                    nvl(BT3,0), nvl(TRANSPORT,0)
+                                                    nvl(BT3,0), nvl(TRANSPORT,0), KRUPP, PLT, TRAD,KA
                                                     from
                                                     (
                                                         select 
@@ -152,12 +152,24 @@ $stidNoTires = oci_parse($ffmesConnection, $text="select
                                                     left join down_codes@curemes on S1.down_code = down_codes.down_code
                                                     left join 
                                                     (
-                                                        select  nvl(round(count(spflags)/60,2),0) TOTAL,
+                                                        select 
+                                                        nvl(round(count(spflags)/60,2),0) TOTAL,
                                                         nvl(round(sum(case when spflags=1 then 1 else 0 end)/60,2),0) BT3,
-                                                        nvl(round(sum(case when spflags=0 then 1 else 0 end)/60,2),0) TRANSPORT
-                                                        from cure_prod_down_notires@curemes
+                                                        nvl(round(sum(case when spflags=0 then 1 else 0 end)/60,2),0) TRANSPORT,
+                                                        nvl(round(sum(case when spflags=1 and grupa='Krupp'  then 1 else 0 end)/60,2),0) KRUPP,
+                                                        nvl(round(sum(case when spflags=1 and grupa='PLT' then 1 else 0 end)/60,2),0) PLT,
+                                                        nvl(round(sum(case when spflags=1 and grupa='TRAD' then 1 else 0 end)/60,2),0) TRAD,
+                                                        nvl(round(sum(case when spflags=1 and grupa is null then 1 else 0 end)/60,2),0) KA
+                                                        from BUILD_NOTIRES_SAMPLING
+                                                        left join 
+                                                        (
+                                                            select  code, case when group_id in ('Krupp', 'PLT') then group_id else 'TRAD' end grupa, sum(qty)
+                                                            from schedule@bld left join machines@bld on machine = name
+                                                            where  sched_date='20180222' and shift = 3 and code like 'PL-GT%' and group_id_00 != 'MRT'
+                                                            group by code, case when group_id in ('Krupp', 'PLT') then group_id else 'TRAD' end
+                                                        ) s1 on gtc=code
                                                         where 
-                                                        dstamp between to_date('".$start." ".$startHr.":00:00', 'yy-mm-dd hh24:mi:ss') and to_date('".$end." ".$endHr.":00:00', 'yy-mm-dd hh24:mi:ss') and resrce not like 'R%'
+                                                        dstamp between to_date('18-02-22 22:00:00', 'yy-mm-dd hh24:mi:ss') and to_date('18-02-23 06:00:00', 'yy-mm-dd hh24:mi:ss') and press not like 'R%'
                                                     ) on 1=1
                                                     group by TOTAL,BT3, TRANSPORT order by round(sum((down_edt-down_sdt)*24),2)  desc");
 

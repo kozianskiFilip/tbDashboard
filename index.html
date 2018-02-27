@@ -47,11 +47,14 @@
             <td id="seitoNoTires"></td>
         </tr>
     </table>
-    <button onclick="test();">TEST</button>
-    <button type = "button" onclick="filter('.Krupp');" class = "machineTypeFilter btn btn-primary">KRUPP</button>
-    <button type = "button" onclick="filter('.PLT');" class = "machineTypeFilter btn btn-primary">PLT</button>
-    <button type = "button" onclick="filter('TRAD');" class = "machineTypeFilter btn btn-primary">TRADYCYJNE</button>
-    <button type = "button" onclick="filter('ALL');" class = "machineTypeFilter btn btn-primary">WSZYSTKIE</button>
+    <div>
+        <button onclick="test();">TEST</button>
+        <button type = "button" onclick="filter('.Krupp');" class = "machineTypeFilter btn btn-primary">KRUPP</button>
+        <button type = "button" onclick="filter('.PLT');" class = "machineTypeFilter btn btn-primary">PLT</button>
+        <button type = "button" onclick="filter('TRAD');" class = "machineTypeFilter btn btn-primary">TRADYCYJNE</button>
+        <button type = "button" onclick="filter('ALL');" class = "machineTypeFilter btn btn-primary">WSZYSTKIE</button>
+    </div>
+    <div id="updateInfo" style="width:100%; text-align: right;font-family: 'Arial Black'; font-style: italic; font-weigh:bold;"></div>
     <table class="table table-responsive table-bordered table-striped table-hover" id="kanbanTable">
         <tr>
             <th>GTC</th>

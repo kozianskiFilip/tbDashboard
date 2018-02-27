@@ -1,0 +1,22 @@
+{
+  "name": "tbDashboard",
+  "homepage": "https://github.com/kozianskiFilip/tbDashboard",
+  "authors": [
+    "Filip Koziański <filip.kozianski@outlook.com>"
+  ],
+  "description": "Dasboard wydziału produkcji opon osobowych - konfekcja i budowa opon surowych",
+  "main": "index.html",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "jquery": "^3.3.1",
+    "boostrap": "^4.0.0"
+  }
+}
