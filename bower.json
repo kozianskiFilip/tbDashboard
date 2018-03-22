@@ -17,6 +17,7 @@
   ],
   "dependencies": {
     "jquery": "^3.3.1",
-    "boostrap": "^4.0.0"
+    "boostrap": "^4.0.0",
+    "moment": "^2.21.0"
   }
 }

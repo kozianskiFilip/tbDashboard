@@ -5,8 +5,8 @@
  * Date: 18-01-12
  * Time: 11:29
  */
-//error_reporting(E_ALL | E_STRICT);
-//ini_set('display_errors', 1);
+error_reporting(E_ALL | E_STRICT);
+ini_set('display_errors', 1);
 $ffmesConnection = oci_connect('minimes_ff_wbr', 'Baza0racl3appl1cs', '172.22.8.47/ORA');
 $h=date('H');
 
@@ -77,7 +77,7 @@ if($h>=22 || $h<6)
 }
 
 // CURRENT RESULTS DATA GATHERING - OUTPUT&PREDICTION BOTH BUILDING&CURING
-$stidCurResults = oci_parse($ffmesConnection,"select output,pred,plan_excel_total,prod,inv_ok,inv_nok,bc3_output,bc3_pred,bc3_schedule,transport,total,PLAN_EXCEL_1,PLAN_EXCEL_2,PLAN_EXCEL_3 from
+$stidCurResults = oci_parse($ffmesConnection,"select output,pred,plan_excel_total,prod,inv_ok,inv_nok,bc3_output,bc3_pred,bc3_schedule,transport,total,PLAN_EXCEL_1,PLAN_EXCEL_2,PLAN_EXCEL_3,krupp_output,plt_output,trad_output,krupp_pred,plt_pred,trad_pred,krupp_inv,plt_inv,trad_inv,krup_nok_inv,plt_nok_inv,trad_nok_inv from
                                             (
                                                 select * from cur_pred left join
                                                 cur_schedule on trunc(sysdate- interval '6' hour,'DDD')=DT and 1=1
@@ -102,7 +102,7 @@ oci_execute($stidCurResults);
 //PUTTING DATA INTO ARRAY WHICH WILL BE TRANSPONED TO JSON AND SENT BACK AS A RESPONSE
 while ($row = oci_fetch_array($stidCurResults, OCI_BOTH))
 {
-    $responseData=array('bc4pred' => $row[1], 'bc4output' => $row[0], 'bc4plan' => $row[2],'inv_ok' => $row[4], 'inv_nok' => $row[5], 'bc3output' => $row[6], 'bc3pred' => $row[7], 'bc3plan' => $row[8], 'transport' => $row[9], 'building' => $row[10], 'avgPress' =>  $row[3] );
+    $responseData=array('bc4pred' => $row[1], 'bc4output' => $row[0], 'bc4plan' => $row[2],'inv_ok' => $row[4], 'inv_nok' => $row[5], 'bc3output' => $row[6], 'bc3pred' => $row[7], 'bc3plan' => $row[8], 'transport' => $row[9], 'building' => $row[10], 'avgPress' =>  $row[3], 'kruppOutput'=>$row[14], 'pltOutput'=>$row[15], 'tradOutput'=>$row[16],'kruppPred'=>$row[17], 'pltPred'=>$row[18],'tradPred'=>$row[19], 'kruppInvOk'=>$row[20], 'pltInvOk'=>$row[21],'tradInvOk'=>$row[22], 'kruppInvNok'=>$row[23],'pltInvNok'=>$row[24],'tradInvNok'=>$row[25]);
     if($shift==1)
         $responseData['bc4shiftPlan']=$row[11];
     if($shift==2)
@@ -115,7 +115,8 @@ while ($row = oci_fetch_array($stidCurResults, OCI_BOTH))
 $stidNoTires = oci_parse($ffmesConnection, $text="select 
                                                     nvl(trunc(sum((down_edt-down_sdt)*24),2),0) SUMA,
                                                     nvl(TOTAL,0),
-                                                    nvl(BT3,0), nvl(TRANSPORT,0), KRUPP, PLT, TRAD,KA
+                                                    nvl(BT3,0), nvl(TRANSPORT,0),
+                                                    nvl(KRUPP,0), nvl(PLT,0), nvl(TRAD,0), nvl(KA,0)
                                                     from
                                                     (
                                                         select 
@@ -156,22 +157,15 @@ $stidNoTires = oci_parse($ffmesConnection, $text="select
                                                         nvl(round(count(spflags)/60,2),0) TOTAL,
                                                         nvl(round(sum(case when spflags=1 then 1 else 0 end)/60,2),0) BT3,
                                                         nvl(round(sum(case when spflags=0 then 1 else 0 end)/60,2),0) TRANSPORT,
-                                                        nvl(round(sum(case when spflags=1 and grupa='Krupp'  then 1 else 0 end)/60,2),0) KRUPP,
-                                                        nvl(round(sum(case when spflags=1 and grupa='PLT' then 1 else 0 end)/60,2),0) PLT,
-                                                        nvl(round(sum(case when spflags=1 and grupa='TRAD' then 1 else 0 end)/60,2),0) TRAD,
-                                                        nvl(round(sum(case when spflags=1 and grupa is null then 1 else 0 end)/60,2),0) KA
+                                                        nvl(round(sum(case when spflags=1 and TBM_GROUP='Krupp'  then 1 else 0 end)/60,2),0) KRUPP,
+                                                        nvl(round(sum(case when spflags=1 and TBM_GROUP='PLT' then 1 else 0 end)/60,2),0) PLT,
+                                                        nvl(round(sum(case when spflags=1 and TBM_GROUP not in ('Krupp', 'PLT') then 1 else 0 end)/60,2),0) TRAD,
+                                                        nvl(round(sum(case when spflags=1 and TBM_GROUP is null then 1 else 0 end)/60,2),0) KA
                                                         from BUILD_NOTIRES_SAMPLING
-                                                        left join 
-                                                        (
-                                                            select  code, case when group_id in ('Krupp', 'PLT') then group_id else 'TRAD' end grupa, sum(qty)
-                                                            from schedule@bld left join machines@bld on machine = name
-                                                            where  sched_date='20180222' and shift = 3 and code like 'PL-GT%' and group_id_00 != 'MRT'
-                                                            group by code, case when group_id in ('Krupp', 'PLT') then group_id else 'TRAD' end
-                                                        ) s1 on gtc=code
                                                         where 
-                                                        dstamp between to_date('18-02-22 22:00:00', 'yy-mm-dd hh24:mi:ss') and to_date('18-02-23 06:00:00', 'yy-mm-dd hh24:mi:ss') and press not like 'R%'
+                                                        dstamp between to_date('".$start." ".$startHr.":00:00','yy-mm-dd hh24:mi:ss') and to_date('".$end." ".$endHr.":00:00','yy-mm-dd hh24:mi:ss') and press not like 'R%'
                                                     ) on 1=1
-                                                    group by TOTAL,BT3, TRANSPORT order by round(sum((down_edt-down_sdt)*24),2)  desc");
+                                                    group by TOTAL,BT3, TRANSPORT,KRUPP,PLT,TRAD,KA order by round(sum((down_edt-down_sdt)*24),2)  desc");
 
 if(oci_execute($stidNoTires))
 {
@@ -179,11 +173,19 @@ if(oci_execute($stidNoTires))
     $responseData['totalNoTires'] = $row[0];
     $responseData['bc3NoTires'] = $row[2];
     $responseData['seitoNoTires'] = $row[3];
+    $responseData['kruppNoTires'] = $row[4];
+    $responseData['pltNoTires'] = $row[5];
+    $responseData['tradNoTires'] = $row[6];
+    $responseData['kaNoTires'] = $row[7];
 }
 else{
     $responseData['totalNoTires'] = 0;
     $responseData['bc3NoTires'] = 0;
     $responseData['seitoNoTires'] = 0;
+    $responseData['kruppNoTires'] = 0;
+    $responseData['pltNoTires'] = 0;
+    $responseData['tradNoTires'] = 0;
+    $responseData['kaNoTires'] = 0;
 }
 
 

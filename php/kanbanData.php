@@ -87,7 +87,7 @@ $data=array();
 $stidKanban = oci_parse($ffmesConnection,
     "SELECT s1.*, 
        CASE 
-         WHEN cur_molds_qty > 0 THEN inv_ok / ( sum_act_ct / sum_act_fh * 
+         WHEN cur_molds_qty > 0 and sum_act_fh>0 and sum_act_ct>0 and cur_molds_qty>0 THEN inv_ok / ( sum_act_ct / sum_act_fh * 
                                                 cur_molds_qty 
                                               ) 
          ELSE 30 
@@ -179,7 +179,7 @@ FROM   (SELECT DISTINCT gtcode,
                   press) s1 
 ORDER  BY count_notires desc, coverage, 
           gtcode, 
-          press");
+          press ");
 
 oci_execute($stidKanban);
 

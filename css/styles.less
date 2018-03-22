@@ -1,9 +1,79 @@
 @textAllignment: center;
 
-#mainTable tr td  {
-  text-align: @textAllignment;
+#mainTable tr td , #kanbanTable tr {
+  text-align: center;
+  vertical-align: middle;
 }
 
-td {
+#kanbanTable tr th td {
+  padding: 0px;
+  border-spacing: 0px;
+}
+
+
+#kanbanTable th, #mainTable th {
   text-align: center;
+  vertical-align: middle;
+}
+
+/*SKALE KOLORÓW DLA ZAPASU GODZINOWEGO*/
+.coverageRed {
+  background-color: red;
+  color: white;
+}
+.coverageGreen {
+  background-color: #0ce823;
+}
+.coverageYellow {
+  background-color: yellow;
+}
+
+/*SKALOWANIE DO ROZMIARU EKRANU*/
+@media screen and (max-width: 700px){
+  #mainTable {
+    font-size:10px;
+  }
+  #kanbanTable {
+    font-size:8px;
+  }
+}
+
+@media screen and (max-width: 800px) {
+  #kanbanTable {
+    font-size:10px;
+  }
+}
+
+
+/* Tooltip container */
+.hintTip {
+  position: relative;
+  display: inline-block;
+  border-color: black;
+  border-style:solid;
+  border-width:1px;
+  border-bottom: 1px dotted black; /* If you want dots under the hoverable text */
+}
+
+/* Tooltip text */
+.hintTip .hintText {
+  visibility: hidden;
+  font-size:12px;
+  width: 180px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+  opacity: 0.65;
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1;
+  top: 100%;
+  left: 100%;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.hintTip:hover .hintText {
+  visibility: visible;
 }

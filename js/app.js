@@ -36,21 +36,21 @@ $(document).ready(function(){
                 if(!$('#'+jasonData[i].gt).html())
                 {
                     var actCurCoverage = (jasonData[i].buildingInvOk/(jasonData[i].moldQty*jasonData[i].curePerHour));
-                    var actCurCoverageText= jasonData[i].moldQty >0 ? Math.trunc(actCurCoverage) + ':' + Math.round((actCurCoverage*60)%60) : '';
+                    var actCurCoverageText= jasonData[i].moldQty >0 ? Math.trunc(actCurCoverage) + ':' + Math.round((actCurCoverage-Math.trunc(actCurCoverage))*60) : '';
 
                     var realCurCoverage = (jasonData[i].buildingInvOk/(jasonData[i].realMoldQty*jasonData[i].realCurePerHour));
-                    var realCurCoverageText= jasonData[i].realMoldQty >0 ?  Math.trunc(realCurCoverage) + ':' + Math.round((realCurCoverage*60)%60) : '';
+                    var realCurCoverageText= jasonData[i].realMoldQty >0 ?  Math.trunc(realCurCoverage) + ':' + Math.round((realCurCoverage-Math.trunc(realCurCoverage))*60) : '';
 
                     var plannedCurCoverage = (jasonData[i].buildingInvOk/(jasonData[i].plannedMoldQty*jasonData[i].plannedCurePerHour));
-                    var plannedCurCoverageText= jasonData[i].plannedMoldQty >0 ? Math.trunc(plannedCurCoverage) + ':' + Math.round((plannedCurCoverage*60)%60) : '';
+                    var plannedCurCoverageText= jasonData[i].plannedMoldQty >0 ? Math.trunc(plannedCurCoverage) + ':' + Math.round((plannedCurCoverage-Math.trunc(plannedCurCoverage))*60) : '';
 
                     $('#kanbanTable').append('<tr value="1" class="kanbanRow '+jasonData[i].buildingGroup+' '+(jasonData[i].buildingMachines == null ? 'warning' : ' ')+'" id="'+jasonData[i].gt+'"><td>'+jasonData[i].gt+'</td>' +
                         '<td id="actCoverage" class="'+(actCurCoverage > 8 ? 'success' : (actCurCoverage > 3 ? 'warning' : 'danger' ))+'">'+actCurCoverageText+'</td>' + //pokrycie wulkanizacji wg zazbrojenia w RFBC
                         '<td id="realCoverage"  class="'+(realCurCoverage > 8 ? 'success' : (realCurCoverage > 3 ? 'warning' : 'danger' ))+'">'+realCurCoverageText+'</td>' + //pokrycie wulkanizacji wg aktualnego stanu
-                        '<td id="plannedCoverage"  class="'+(plannedCurCoverage > 8 ? 'success' : (plannedCurCoverage > 3 ? 'warning' : 'danger' ))+'">'+plannedCurCoverageText+'</td>' + //pokrycie wulkanizacji wg planu
+                     //   '<td id="plannedCoverage"  class="'+(plannedCurCoverage > 8 ? 'success' : (plannedCurCoverage > 3 ? 'warning' : 'danger' ))+'">'+plannedCurCoverageText+'</td>' + //pokrycie wulkanizacji wg planu
                         '<td>'+jasonData[i].moldQty+'/'+jasonData[i].realMoldQty+'/'+jasonData[i].plannedMoldQty+'</td>' +  // ilość form
-                        '<td style="text-align: left;">'+jasonData[i].buildingMachines+'</td>' +
                         '<td>'+jasonData[i].buildingInvOk+'('+jasonData[i].buildingInvNok+')</td>' +
+                        '<td style="text-align: left;">'+jasonData[i].buildingMachines+'</td>' +
                         '<td>'+jasonData[i].moldsNoTires+'</td>' +
                         '<td style="display:none"></td>' +
                         '</tr>');
@@ -78,6 +78,21 @@ $(document).ready(function(){
             $('#inventory').html(jasonData.inv_ok + '(' + jasonData.inv_nok + ')');
             $('#lackTires').html(jasonData.totalNoTires + ' FH');
 
+
+            //MACHINE GROUP TABLE FILL
+                //TBMS OUTPUT/FORECAST
+            $('#kruppOutput').html(jasonData.kruppOutput + '('+jasonData.kruppPred + ')');
+            $('#pltOutput').html(jasonData.pltOutput + '('+jasonData.pltPred + ')');
+            $('#tradOutput').html(jasonData.tradOutput + '('+jasonData.tradPred + ')');
+                //TBMS INVENTORY
+            $('#kruppInventory').html(jasonData.kruppInvOk + '('+jasonData.kruppInvNok + ')');
+            $('#pltInventory').html(jasonData.pltInvOk + '('+jasonData.pltInvNok + ')');
+            $('#tradInventory').html(jasonData.tradInvOk + '('+jasonData.tradInvNok + ')');
+
+                //TBMS NOTIRES
+            $('#kruppNoTires').html(jasonData.kruppNoTires);
+            $('#pltNoTires').html(jasonData.pltNoTires);
+            $('#tradNoTires').html(jasonData.tradNoTires);
 
             //TOTAL NO TIRES COLOR
             if(jasonData.totalNoTires > 50)
@@ -142,5 +157,12 @@ $(document).ready(function(){
     setInterval(getData,300000);
     getData();
 
+    // $("tr").hover(function(){
+    //      $('#x').show();
+    // }, function(){
+    //     $('#x').hide();
+    // });
+
 });
+
 

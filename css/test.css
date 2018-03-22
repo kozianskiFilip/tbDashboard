@@ -3,6 +3,12 @@
     vertical-align: middle;
 }
 
+#kanbanTable tr th td {
+    padding: 0px;
+    border-spacing: 0px;
+}
+
+
 #kanbanTable th, #mainTable th {
     text-align: center;
     vertical-align: middle;

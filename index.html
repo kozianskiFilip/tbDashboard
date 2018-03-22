@@ -47,25 +47,64 @@
             <td id="seitoNoTires"></td>
         </tr>
     </table>
-    <div>
-        <button onclick="test();">TEST</button>
+    <table class="table table-responsive table-bordered" id="groupStats">
+        <tr>
+            <th>GROUP</th>
+            <th>OUTPUT</th>
+            <th>INV</th>
+            <th>FH</th>
+            <th>AW</th>
+            <th>BE</th>
+            <th>ZJ</th>
+        </tr>
+        <tr>
+            <td>KRUPP</td>
+            <td id="kruppOutput"></td>
+            <td id="kruppInventory"></td>
+            <td id="kruppNoTires"></td>
+            <td id="kruppBreakdowns"></td>
+            <td id="kruppNoElements"></td>
+            <td id="kruppBadQuality"></td>
+        </tr>
+        <tr>
+            <td>PLT</td>
+            <td id="pltOutput"></td>
+            <td id="pltInventory"></td>
+            <td id="pltNoTires"></td>
+            <td id="pltBreakdowns"></td>
+            <td id="pltNoElements"></td>
+            <td id="pltBadQuality"></td>
+        </tr>
+        <tr>
+            <td>TRAD</td>
+            <td id="tradOutput"></td>
+            <td id="tradInventory"></td>
+            <td id="tradNoTires"></td>
+            <td id="tradBreakdowns"></td>
+            <td id="tradNoElements"></td>
+            <td id="tradBadQuality"></td>
+        </tr>
+    </table>
+    <div style="text-align: center;">
+        <button onclick="window.open('172.22.8.102/usc', 'winname',  directories=0,titlebar=0,toolbar=0,location=0,status=0, menubar=0,scrollbars=no,resizable=no, width=400,height=350);" class="btn btn-danger" >IZOLATOR</button>
         <button type = "button" onclick="filter('.Krupp');" class = "machineTypeFilter btn btn-primary">KRUPP</button>
         <button type = "button" onclick="filter('.PLT');" class = "machineTypeFilter btn btn-primary">PLT</button>
         <button type = "button" onclick="filter('TRAD');" class = "machineTypeFilter btn btn-primary">TRADYCYJNE</button>
         <button type = "button" onclick="filter('ALL');" class = "machineTypeFilter btn btn-primary">WSZYSTKIE</button>
     </div>
     <div id="updateInfo" style="width:100%; text-align: right;font-family: 'Arial Black'; font-style: italic; font-weigh:bold;"></div>
-    <table class="table table-responsive table-bordered table-striped table-hover" id="kanbanTable">
+    <table class="table table-responsive table-bordered table-striped table-hover" id="kanbanTable" cellpadding="0">
         <tr>
             <th>GTC</th>
-            <th colspan="3">COV</th>
+            <th colspan="2">COV</th>
             <th>MOLDS</br><span style="font-size:70%">A/R/P</span></th>
-            <th>TBMS</th>
             <th>INV</th>
+            <th>TBMS</th>
             <th>X</th>
             <th style="display: none"></th>
         </tr>
     </table>
+    <div id="x" style ="background-color: #00aa88; width: 80%; height:120px; position: fixed; top: 30%; left: 10%; display: none;" onmouseover="hoverTbms();"></div>
 </div>
 </body>
 </html>
